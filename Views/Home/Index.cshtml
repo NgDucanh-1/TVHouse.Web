@@ -1,0 +1,132 @@
+@* TRANG CHỦ CỬA HÀNG: banner, bộ lọc danh mục, sắp xếp, lưới sản phẩm (ảnh lấy từ SQL), cửa sổ "Chi tiết" và các ô dịch vụ. *@
+@model ShopViewModel
+@{
+    ViewData["Title"] = "Demo cửa hàng Tivi";
+    var returnUrl = Context.Request.Path + Context.Request.QueryString;
+}
+<main id="shopPage">
+    <section class="hero">
+        <div class="hero-copy">
+            <div class="eyebrow">Công nghệ giải trí cho mọi gia đình</div>
+            <h1>Nâng tầm trải nghiệm<br>xem TV của bạn</h1>
+            <p>Khám phá các dòng Smart TV chính hãng với hình ảnh sắc nét, âm thanh sống động và chính sách bảo hành uy tín.</p>
+            <a class="primary-btn" href="#productsSection">Khám phá sản phẩm</a>
+        </div>
+        <div class="hero-art" aria-hidden="true">📺</div>
+    </section>
+
+    <section id="productsSection">
+        <div class="section-head">
+            <div>
+                <h2>Sản phẩm nổi bật</h2>
+                <p>Lựa chọn chiếc tivi phù hợp với không gian của bạn</p>
+            </div>
+        </div>
+
+        <div class="filters" id="filters">
+            <a class="chip @(Model.ActiveCategory == "" ? "active" : "")" asp-action="Index" asp-route-q="@Model.Query" asp-route-sort="@Model.Sort">Tất cả</a>
+            @foreach (var c in Model.Categories)
+            {
+                <a class="chip @(Model.ActiveCategory == c.Name ? "active" : "")" asp-action="Index" asp-route-category="@c.Name" asp-route-q="@Model.Query" asp-route-sort="@Model.Sort">@c.Name.Replace("Tivi ", "")</a>
+            }
+        </div>
+
+        <form class="toolbar" method="get" asp-action="Index">
+            <span id="productCount">@Model.Products.Count sản phẩm</span>
+            <input type="hidden" name="category" value="@Model.ActiveCategory" />
+            <input type="hidden" name="q" value="@Model.Query" />
+            <select name="sort" onchange="this.form.submit()" aria-label="Sắp xếp sản phẩm">
+                <option value="featured" selected="@(Model.Sort == "featured")">Nổi bật</option>
+                <option value="low" selected="@(Model.Sort == "low")">Giá thấp đến cao</option>
+                <option value="high" selected="@(Model.Sort == "high")">Giá cao đến thấp</option>
+            </select>
+        </form>
+
+        <div class="products" id="productGrid">
+            @if (Model.Products.Count == 0)
+            {
+                <div class="empty">Không tìm thấy sản phẩm phù hợp.</div>
+            }
+            @foreach (var p in Model.Products)
+            {
+                <article class="product">
+                    <div class="product-art">
+                        <span class="tag">@(p.Stock < 1 ? "Hết hàng" : p.Stock <= 5 ? "Sắp hết hàng" : "Chính hãng")</span>
+                        @if (p.MainImageId.HasValue)
+                        {
+                            <img src="@Fmt.Image(p.MainImageId)" alt="@p.Name" loading="lazy" />
+                        }
+                        else
+                        {
+                            <div class="tv-icon" aria-hidden="true"></div>
+                        }
+                    </div>
+                    <div class="product-info">
+                        <div class="brand">@p.Brand</div>
+                        <h3>@p.Name</h3>
+                        <div class="spec">@p.ScreenSize inch · @p.Resolution · @p.OperatingSystem</div>
+                        <div class="price-row">
+                            <span class="price">@Fmt.Money(p.Price)</span>
+                            @if (p.OldPrice > p.Price)
+                            {
+                                <span class="old-price">@Fmt.Money(p.OldPrice)</span>
+                            }
+                        </div>
+                        <div class="product-actions">
+                            <button type="button" class="detail-btn" data-detail
+                                    data-id="@p.Id" data-name="@p.Name" data-brand="@p.Brand" data-model="@p.Model" data-image="@Fmt.Image(p.MainImageId)"
+                                    data-size="@p.ScreenSize inch" data-res="@p.Resolution" data-os="@p.OperatingSystem"
+                                    data-warranty="@p.WarrantyMonths tháng" data-stock="@p.Stock"
+                                    data-price="@Fmt.Money(p.Price)">Chi tiết</button>
+                            <form method="post" asp-controller="Cart" asp-action="Add">
+                                <input type="hidden" name="id" value="@p.Id" />
+                                <input type="hidden" name="returnUrl" value="@returnUrl" />
+                                <button type="submit" class="add-btn" disabled="@(p.Stock < 1)">Thêm giỏ</button>
+                            </form>
+                        </div>
+                    </div>
+                </article>
+            }
+        </div>
+    </section>
+
+    <section class="features" id="features">
+        <div class="feature"><div class="feature-icon">🚚</div><div><b>Giao hàng nhanh</b><small>Hỗ trợ giao tận nhà</small></div></div>
+        <div class="feature"><div class="feature-icon">🛡️</div><div><b>Bảo hành chính hãng</b><small>An tâm khi sử dụng</small></div></div>
+        <div class="feature"><div class="feature-icon">💳</div><div><b>Thanh toán linh hoạt</b><small>Nhiều phương thức</small></div></div>
+        <div class="feature"><div class="feature-icon">☎️</div><div><b>Hỗ trợ tận tâm</b><small>Tư vấn trước và sau mua</small></div></div>
+    </section>
+
+    <footer class="footer">
+        <span>© @DateTime.Now.Year TV House — Demo website bán Tivi</span>
+        <span>Hotline: 1900 2026 · Hà Nội</span>
+    </footer>
+</main>
+
+<!-- Modal chi tiết sản phẩm (nội dung do site.js điền từ data-*) -->
+<div class="modal-backdrop" id="modalBackdrop">
+    <div class="modal">
+        <div class="modal-head">
+            <h2 id="modalTitle">Thông tin</h2>
+            <button type="button" class="close" id="closeModal" aria-label="Đóng">×</button>
+        </div>
+        <div id="modalBody">
+            <img class="modal-img" id="modalImage" alt="" hidden />
+            <p>
+                <b>Thương hiệu:</b> <span data-f="brand"></span><br>
+                <b>Model:</b> <span data-f="model"></span><br>
+                <b>Kích thước:</b> <span data-f="size"></span><br>
+                <b>Độ phân giải:</b> <span data-f="res"></span><br>
+                <b>Hệ điều hành:</b> <span data-f="os"></span><br>
+                <b>Bảo hành:</b> <span data-f="warranty"></span><br>
+                <b>Tồn kho:</b> <span data-f="stock"></span>
+            </p>
+            <p class="modal-price" data-f="price"></p>
+            <form method="post" asp-controller="Cart" asp-action="Add">
+                <input type="hidden" name="id" value="" />
+                <input type="hidden" name="returnUrl" value="@returnUrl" />
+                <button type="submit" class="admin-btn">Thêm vào giỏ hàng</button>
+            </form>
+        </div>
+    </div>
+</div>

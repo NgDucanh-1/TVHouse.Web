@@ -1,0 +1,46 @@
+@* KHUNG TRANG QUẢN TRỊ (nằm trong _Layout): tiêu đề, 4 ô thống kê, menu bên trái và vùng nội dung của từng trang quản trị. *@
+@{
+    Layout = "_Layout";
+    var stats = ViewData["Stats"] as AdminStats ?? new AdminStats();
+    var section = ViewData["Section"] as string ?? "overview";
+    string Active(string s) => s == section ? "active" : "";
+}
+<main id="adminPage">
+    <div class="admin-title">
+        <div>
+            <h1>Quản lý cửa hàng</h1>
+            <p>Tổng quan hoạt động kinh doanh TV House</p>
+        </div>
+        <div>
+            <span class="hint">Xin chào, <b>@(User.FindFirst("DisplayName")?.Value ?? User.Identity?.Name)</b></span>
+            <a class="secondary-btn" asp-controller="Account" asp-action="ChangePassword">Đổi mật khẩu</a>
+            <a class="secondary-btn" asp-controller="Home" asp-action="Index">← Về cửa hàng</a>
+        </div>
+    </div>
+
+    <div class="stats">
+        <div class="stat"><div class="stat-label">Tổng sản phẩm</div><div class="stat-value">@stats.ProductCount</div><div class="stat-note">Sản phẩm trong danh mục</div></div>
+        <div class="stat"><div class="stat-label">Đơn hàng</div><div class="stat-value">@stats.OrderCount</div><div class="stat-note">Tất cả trạng thái</div></div>
+        <div class="stat"><div class="stat-label">Doanh thu hoàn thành</div><div class="stat-value">@Fmt.Million(stats.Revenue)</div><div class="stat-note">Tính theo đơn đã hoàn thành</div></div>
+        <div class="stat"><div class="stat-label">Sắp hết hàng</div><div class="stat-value">@stats.LowStockCount</div><div class="stat-note">Tồn kho từ 5 sản phẩm trở xuống</div></div>
+    </div>
+
+    <div class="admin-layout">
+        <aside class="side-menu" id="managementMenu">
+            <a class="@Active("overview")" asp-controller="Admin" asp-action="Index">Tổng quan</a>
+            <a class="@Active("products")" asp-controller="Admin" asp-action="Products">Sản phẩm</a>
+            <a class="@Active("inventory")" asp-controller="Admin" asp-action="Inventory">Kho hàng</a>
+            <a class="@Active("imports")" asp-controller="Admin" asp-action="Imports">Nhập hàng</a>
+            <a class="@Active("suppliers")" asp-controller="Admin" asp-action="Suppliers">Nhà cung cấp</a>
+            <a class="@Active("orders")" asp-controller="Admin" asp-action="Orders">Đơn hàng</a>
+            <a class="@Active("invoices")" asp-controller="Admin" asp-action="Invoices">Hóa đơn</a>
+            <a class="@Active("customers")" asp-controller="Admin" asp-action="Customers">Khách hàng</a>
+            <a class="@Active("employees")" asp-controller="Admin" asp-action="Employees">Nhân viên</a>
+            <a class="@Active("discounts")" asp-controller="Admin" asp-action="Discounts">Mã giảm giá</a>
+            <a class="@Active("reports")" asp-controller="Admin" asp-action="Reports">Báo cáo</a>
+        </aside>
+        <div>
+            @RenderBody()
+        </div>
+    </div>
+</main>

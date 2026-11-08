@@ -1,0 +1,41 @@
+@* QUẢN TRỊ - DANH SÁCH NHÀ CUNG CẤP. *@
+@model List<SupplierRow>
+@{
+    ViewData["Title"] = "Quản trị — Nhà cung cấp";
+    ViewData["Section"] = "suppliers";
+}
+<div class="panel">
+    <div class="panel-head">
+        <h2>Nhà cung cấp</h2>
+        <a class="admin-btn" asp-action="SupplierCreate">+ Thêm nhà cung cấp</a>
+    </div>
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>Mã NCC</th><th>Tên nhà cung cấp</th><th>Liên hệ</th><th>Điện thoại</th><th>Email</th><th>Địa chỉ</th><th class="num">Phiếu nhập</th><th>Thao tác</th></tr></thead>
+            <tbody>
+            @foreach (var r in Model)
+            {
+                <tr>
+                    <td>@r.Supplier.SupplierCode</td>
+                    <td><b>@r.Supplier.Name</b></td>
+                    <td>@r.Supplier.ContactPerson</td>
+                    <td>@r.Supplier.Phone</td>
+                    <td>@r.Supplier.Email</td>
+                    <td>@r.Supplier.Address</td>
+                    <td class="num">@r.ReceiptCount</td>
+                    <td>
+                        <a class="action-btn" asp-action="SupplierEdit" asp-route-id="@r.Supplier.Id">Sửa</a>
+                        <form class="inline" method="post" asp-action="SupplierDelete" asp-route-id="@r.Supplier.Id" data-confirm="Xóa nhà cung cấp này? (lịch sử phiếu nhập vẫn được giữ)">
+                            <button type="submit" class="action-btn">Xóa</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+            @if (Model.Count == 0)
+            {
+                <tr><td colspan="8">Chưa có nhà cung cấp.</td></tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>

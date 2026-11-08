@@ -1,0 +1,63 @@
+@* KHUNG GIAO DIỆN CHUNG: thanh trên cùng (logo, ô tìm kiếm, Giỏ hàng, Đăng nhập/Đăng xuất), menu danh mục, vùng nội dung @RenderBody() và thông báo nhanh (toast). *@
+@inject TVHouse.Web.Services.CartService Cart
+@{
+    var controller = (ViewContext.RouteData.Values["controller"] as string) ?? "";
+    var activeCategory = Context.Request.Query["category"].ToString();
+    var searchText = Context.Request.Query["q"].ToString();
+    bool onShop = controller == "Home";
+    string NavClass(string cat) => onShop && activeCategory == cat ? "selected" : "";
+}
+<!doctype html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>@(ViewData["Title"] ?? "Trang chủ") — TV House</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+<div id="app">
+    <header class="topbar">
+        <div class="top-inner">
+            <a class="logo" asp-controller="Home" asp-action="Index"><span class="logo-mark"></span> TV HOUSE</a>
+            <form class="search" method="get" asp-controller="Home" asp-action="Index">
+                @if (onShop && !string.IsNullOrEmpty(activeCategory))
+                {
+                    <input type="hidden" name="category" value="@activeCategory" />
+                }
+                <input id="searchInput" name="q" type="search" value="@searchText" placeholder="Tìm tên tivi, thương hiệu, model...">
+                <button id="searchBtn" type="submit">Tìm kiếm</button>
+            </form>
+            <div class="top-actions">
+                <a class="top-btn @(controller == "Cart" ? "active" : "")" asp-controller="Cart" asp-action="Index">Giỏ hàng <span id="cartCount">@Cart.Count()</span></a>
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <a class="top-btn @(controller == "Admin" ? "active" : "")" asp-controller="Admin" asp-action="Index">Quản trị</a>
+                    <form class="inline" method="post" asp-controller="Account" asp-action="Logout">
+                        <button type="submit" class="top-btn" title="Đăng xuất tài khoản @User.Identity.Name">Đăng xuất</button>
+                    </form>
+                }
+                else
+                {
+                    <a class="top-btn @(controller == "Account" ? "active" : "")" asp-controller="Account" asp-action="Login">Đăng nhập</a>
+                }
+            </div>
+        </div>
+    </header>
+    <nav class="nav">
+        <div class="nav-inner" id="mainNav">
+            <a class="@(onShop && activeCategory == "" ? "selected" : "")" asp-controller="Home" asp-action="Index">Trang chủ</a>
+            <a class="@NavClass("Tivi OLED")" asp-controller="Home" asp-action="Index" asp-route-category="Tivi OLED">Tivi OLED</a>
+            <a class="@NavClass("Tivi QLED")" asp-controller="Home" asp-action="Index" asp-route-category="Tivi QLED">Tivi QLED</a>
+            <a class="@NavClass("Tivi LED")" asp-controller="Home" asp-action="Index" asp-route-category="Tivi LED">Tivi LED</a>
+            <a asp-controller="Home" asp-action="Index" asp-fragment="features">Dịch vụ</a>
+        </div>
+    </nav>
+
+    @RenderBody()
+
+    <div class="toast" id="toast">@TempData["Toast"]</div>
+</div>
+<script src="~/js/site.js" asp-append-version="true"></script>
+</body>
+</html>

@@ -1,0 +1,115 @@
+@* TRANG GIỎ HÀNG & XUẤT HÓA ĐƠN: bảng hàng trong giỏ (trái) và form thông tin khách, nhân viên tư vấn, thanh toán, mã giảm giá (phải). *@
+@model CheckoutViewModel
+@{
+    ViewData["Title"] = "Giỏ hàng & xuất hóa đơn";
+}
+<main>
+    <div class="admin-title">
+        <div>
+            <h1>Giỏ hàng & xuất hóa đơn</h1>
+            <p>Kiểm tra sản phẩm, nhập thông tin khách mua tại quầy rồi xuất hóa đơn</p>
+        </div>
+        <a class="secondary-btn" asp-controller="Home" asp-action="Index">← Tiếp tục mua sắm</a>
+    </div>
+
+    @if (Model.Lines.Count == 0)
+    {
+        <div class="panel"><div class="empty">Giỏ hàng đang trống.</div></div>
+    }
+    else
+    {
+        <div class="checkout-grid">
+            <div class="panel">
+                <div class="panel-head"><h2>Sản phẩm trong giỏ</h2><span>@Model.Lines.Count sản phẩm</span></div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr><th>Sản phẩm</th><th class="num">Đơn giá</th><th class="num">SL</th><th class="num">Thành tiền</th><th></th></tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var l in Model.Lines)
+                        {
+                            <tr>
+                                <td>
+                                    @if (l.Product.MainImageId.HasValue)
+                                    {
+                                        <img class="thumb" src="@Fmt.Image(l.Product.MainImageId)" alt="" />
+                                    }
+                                    else
+                                    {
+                                        <span class="thumb thumb-empty">📺</span>
+                                    }
+                                    <span class="thumb-text"><b>@l.Product.Name</b><br><small>@l.Product.Model</small></span>
+                                </td>
+                                <td class="num">@Fmt.Money(l.Product.Price)</td>
+                                <td class="num">@l.Quantity</td>
+                                <td class="num">@Fmt.Money(l.LineTotal)</td>
+                                <td>
+                                    <form class="inline" method="post" asp-action="Remove" asp-route-id="@l.Product.Id">
+                                        <button type="submit" class="action-btn">Xóa</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-head"><h2>Thông tin hóa đơn</h2><span>Khách mua tại quầy</span></div>
+                <form method="post" asp-action="Checkout">
+                    <div class="form-grid">
+                        <label class="full">Họ tên khách hàng *
+                            <input class="field" asp-for="CustomerName" placeholder="VD: Nguyễn Văn An" />
+                            <span class="field-error" asp-validation-for="CustomerName"></span>
+                        </label>
+                        <label>Số điện thoại
+                            <input class="field" asp-for="Phone" placeholder="VD: 0912345678" />
+                            <span class="field-error" asp-validation-for="Phone"></span>
+                        </label>
+                        <label>Email
+                            <input class="field" asp-for="Email" placeholder="VD: an@example.com" />
+                            <span class="field-error" asp-validation-for="Email"></span>
+                        </label>
+                        <label class="full">Nhân viên tư vấn *
+                            <select class="field" asp-for="EmployeeId" asp-items="Model.Employees">
+                                <option value="0">— Chọn nhân viên tư vấn —</option>
+                            </select>
+                            <span class="field-error" asp-validation-for="EmployeeId"></span>
+                        </label>
+                        <label class="full">Phương thức thanh toán *
+                            <select class="field" asp-for="PaymentMethod"
+                                    asp-items="@(PaymentMethods.All.Select(x => new SelectListItem(x, x)))"></select>
+                            <span class="field-error" asp-validation-for="PaymentMethod"></span>
+                        </label>
+                        <label class="full">Mã giảm giá (nếu có)
+                            <span class="code-row">
+                                <input class="field" asp-for="DiscountCode" placeholder="VD: TVHOUSE20" autocomplete="off" />
+                                <button type="submit" class="secondary-btn" asp-action="ApplyCode" formnovalidate>Áp dụng</button>
+                            </span>
+                            <span class="field-error" asp-validation-for="DiscountCode"></span>
+                            @if (!string.IsNullOrEmpty(Model.DiscountMessage))
+                            {
+                                <span class="discount-msg @(Model.DiscountValid ? "good" : "bad")">@Model.DiscountMessage</span>
+                            }
+                        </label>
+                    </div>
+
+                    <div class="sum-box">
+                        <div class="sum-row"><span>Tạm tính</span><b>@Fmt.Money(Model.Subtotal)</b></div>
+                        @if (Model.DiscountAmount > 0)
+                        {
+                            <div class="sum-row good"><span>Giảm giá</span><b>- @Fmt.Money(Model.DiscountAmount)</b></div>
+                        }
+                        <div class="sum-row total"><span>Tổng thanh toán</span><b>@Fmt.Money(Model.Total)</b></div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="admin-btn">Thanh toán & xuất hóa đơn</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    }
+</main>

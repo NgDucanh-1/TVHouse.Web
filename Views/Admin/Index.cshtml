@@ -1,0 +1,65 @@
+@* QUẢN TRỊ - TỔNG QUAN: đơn hàng cần xử lý, cảnh báo tồn kho, nút xuất file SQL. *@
+@model AdminOverviewViewModel
+@{
+    ViewData["Title"] = "Quản trị — Tổng quan";
+    ViewData["Section"] = "overview";
+}
+<div class="panel">
+    <div class="panel-head"><h2>Đơn hàng cần xử lý</h2><span>Dữ liệu từ SQL Server</span></div>
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>Mã đơn</th><th>Khách hàng</th><th>NV tư vấn</th><th>Ngày</th><th>Tổng tiền</th><th>Trạng thái</th></tr></thead>
+            <tbody>
+            @foreach (var o in Model.PendingOrders)
+            {
+                <tr>
+                    <td>#@o.OrderCode</td>
+                    <td>@o.CustomerName</td>
+                    <td>@o.EmployeeName</td>
+                    <td>@Fmt.Date(o.OrderDate)</td>
+                    <td>@Fmt.Money(o.TotalAmount)</td>
+                    <td><span class="status @OrderStatus.CssClass(o.Status)">@OrderStatus.Label(o.Status)</span></td>
+                </tr>
+            }
+            @if (Model.PendingOrders.Count == 0)
+            {
+                <tr><td colspan="6">Không có đơn cần xử lý.</td></tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="panel">
+    <div class="panel-head"><h2>Cảnh báo tồn kho</h2><span>Sản phẩm cần nhập thêm</span></div>
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>Sản phẩm</th><th>Model</th><th>Tồn kho</th><th>Trạng thái</th></tr></thead>
+            <tbody>
+            @foreach (var p in Model.LowStock)
+            {
+                <tr>
+                    <td>@p.Name</td>
+                    <td>@p.Model</td>
+                    <td>@p.Stock</td>
+                    <td><span class="status bad">@(p.Stock == 0 ? "Hết hàng" : "Cần nhập hàng")</span></td>
+                </tr>
+            }
+            @if (Model.LowStock.Count == 0)
+            {
+                <tr><td colspan="4">Tồn kho đang ổn định.</td></tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="panel">
+    <div class="panel-head"><h2>Sao lưu dữ liệu ra file SQL</h2><span>Dữ liệu web lưu trong SQL Server</span></div>
+    <p class="hint" style="margin:0 0 12px">
+        Mọi thay đổi trên web (sản phẩm, ảnh, đơn hàng, hóa đơn, nhân viên, mã giảm giá...) được ghi trực tiếp vào database <b>TVHouseDB</b>.
+        Bấm nút dưới đây để tải về 1 file <b>.sql</b> mới gồm cấu trúc bảng + toàn bộ dữ liệu hiện tại (kể cả ảnh sản phẩm),
+        có thể mở bằng SSMS / Azure Data Studio để khôi phục bất cứ lúc nào.
+    </p>
+    <a class="admin-btn" asp-action="ExportSql">⬇ Xuất file SQL</a>
+</div>

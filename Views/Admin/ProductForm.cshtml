@@ -1,0 +1,87 @@
+@* QUẢN TRỊ - FORM THÊM/SỬA SẢN PHẨM: thông tin sản phẩm và quản lý nhiều ảnh (tải ảnh mới, tick xóa ảnh cũ). *@
+@model ProductFormViewModel
+@{
+    var isNew = Model.Id == 0;
+    ViewData["Title"] = isNew ? "Quản trị — Thêm sản phẩm" : "Quản trị — Sửa sản phẩm";
+    ViewData["Section"] = "products";
+    var categories = (IEnumerable<SelectListItem>)ViewBag.Categories;
+}
+<div class="panel">
+    <div class="panel-head"><h2>@(isNew ? "Thêm sản phẩm" : "Sửa sản phẩm")</h2></div>
+    <form method="post" asp-action="ProductSave" enctype="multipart/form-data">
+        <input type="hidden" asp-for="Id" />
+        <div class="form-grid">
+            <label class="full">Tên sản phẩm
+                <input class="field" asp-for="Name" />
+                <span class="field-error" asp-validation-for="Name"></span>
+            </label>
+            <label>Thương hiệu
+                <input class="field" asp-for="Brand" />
+                <span class="field-error" asp-validation-for="Brand"></span>
+            </label>
+            <label>Mã model
+                <input class="field" asp-for="Model" />
+                <span class="field-error" asp-validation-for="Model"></span>
+            </label>
+            <label>Danh mục
+                <select class="field" asp-for="CategoryId" asp-items="categories"></select>
+                <span class="field-error" asp-validation-for="CategoryId"></span>
+            </label>
+            <label>Kích thước (inch)
+                <input class="field" asp-for="ScreenSize" type="number" min="10" max="150" />
+                <span class="field-error" asp-validation-for="ScreenSize"></span>
+            </label>
+            <label>Độ phân giải
+                <input class="field" asp-for="Resolution" />
+                <span class="field-error" asp-validation-for="Resolution"></span>
+            </label>
+            <label>Hệ điều hành
+                <input class="field" asp-for="OperatingSystem" />
+                <span class="field-error" asp-validation-for="OperatingSystem"></span>
+            </label>
+            <label>Giá bán (VNĐ)
+                <input class="field" asp-for="Price" type="number" min="1" step="1" />
+                <span class="field-error" asp-validation-for="Price"></span>
+            </label>
+            <label>Giá gốc (VNĐ)
+                <input class="field" asp-for="OldPrice" type="number" min="0" step="1" />
+                <span class="field-error" asp-validation-for="OldPrice"></span>
+            </label>
+            <label>Bảo hành (tháng)
+                <input class="field" asp-for="WarrantyMonths" type="number" min="0" max="120" />
+                <span class="field-error" asp-validation-for="WarrantyMonths"></span>
+            </label>
+            <label class="check">
+                <input type="checkbox" asp-for="IsFeatured" /> Sản phẩm nổi bật
+            </label>
+
+            <div class="full">
+                <div class="field-title">Ảnh sản phẩm (lưu trong SQL Server, bảng ProductImages)</div>
+                @if (Model.ExistingImages.Count > 0)
+                {
+                    <div class="img-grid">
+                        @for (var i = 0; i < Model.ExistingImages.Count; i++)
+                        {
+                            var im = Model.ExistingImages[i];
+                            <label class="img-item">
+                                <img src="/img/@im.Id" alt="@im.FileName" />
+                                @if (i == 0) { <span class="tag-main">Ảnh chính</span> }
+                                <span><input type="checkbox" name="DeleteImageIds" value="@im.Id" /> Xóa ảnh này</span>
+                            </label>
+                        }
+                    </div>
+                }
+                <label>Thêm ảnh mới <span class="hint">(JPG, PNG, WEBP, GIF — tối đa 3 MB/ảnh, chọn được nhiều ảnh)</span>
+                    <input class="field" type="file" name="ImageFiles" id="ImageFiles" multiple accept=".jpg,.jpeg,.png,.webp,.gif,image/*" />
+                    <span class="field-error" asp-validation-for="ImageFiles"></span>
+                </label>
+                <div class="img-grid" id="newImagePreviews"></div>
+            </div>
+        </div>
+        <p class="hint">Tồn kho không nhập ở đây: sản phẩm mới có tồn kho 0, số lượng tăng khi tạo phiếu nhập hàng.</p>
+        <div class="form-actions">
+            <button type="submit" class="admin-btn">Lưu sản phẩm</button>
+            <a class="secondary-btn" asp-action="Products">Hủy</a>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,35 @@
+@* QUẢN TRỊ - DANH SÁCH PHIẾU NHẬP HÀNG (kèm nhà cung cấp). *@
+@model List<ImportReceipt>
+@{
+    ViewData["Title"] = "Quản trị — Nhập hàng";
+    ViewData["Section"] = "imports";
+}
+<div class="panel">
+    <div class="panel-head">
+        <h2>Phiếu nhập hàng</h2>
+        <a class="admin-btn" asp-action="ImportCreate">+ Tạo phiếu nhập</a>
+    </div>
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>Mã phiếu</th><th>Ngày</th><th>Nhà cung cấp</th><th>Sản phẩm</th><th class="num">SL</th><th class="num">Đơn giá</th><th class="num">Thành tiền</th></tr></thead>
+            <tbody>
+            @foreach (var x in Model)
+            {
+                <tr>
+                    <td>#@x.ReceiptCode</td>
+                    <td>@Fmt.Date(x.ImportDate)</td>
+                    <td>@x.Supplier.Name</td>
+                    <td>@x.Product.Name</td>
+                    <td class="num">@x.Quantity</td>
+                    <td class="num">@Fmt.Money(x.UnitPrice)</td>
+                    <td class="num">@Fmt.Money(x.LineTotal)</td>
+                </tr>
+            }
+            @if (Model.Count == 0)
+            {
+                <tr><td colspan="7">Chưa có phiếu nhập hàng.</td></tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>

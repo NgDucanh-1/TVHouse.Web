@@ -1,0 +1,39 @@
+@* QUẢN TRỊ - FORM THÊM/SỬA NHÂN VIÊN. *@
+@model EmployeeFormViewModel
+@{
+    var isNew = Model.Id == 0;
+    ViewData["Title"] = isNew ? "Quản trị — Thêm nhân viên" : "Quản trị — Sửa nhân viên";
+    ViewData["Section"] = "employees";
+}
+<div class="panel">
+    <div class="panel-head"><h2>@(isNew ? "Thêm nhân viên" : "Sửa nhân viên")</h2></div>
+    <form method="post" asp-action="EmployeeSave">
+        <input type="hidden" asp-for="Id" />
+        <div class="form-grid">
+            <label class="full">Họ tên *
+                <input class="field" asp-for="FullName" />
+                <span class="field-error" asp-validation-for="FullName"></span>
+            </label>
+            <label>Chức vụ *
+                <input class="field" asp-for="Position" />
+                <span class="field-error" asp-validation-for="Position"></span>
+            </label>
+            <label>Ngày vào làm
+                <input class="field" asp-for="HireDate" type="date" />
+                <span class="field-error" asp-validation-for="HireDate"></span>
+            </label>
+            <label>Điện thoại
+                <input class="field" asp-for="Phone" />
+                <span class="field-error" asp-validation-for="Phone"></span>
+            </label>
+            <label>Email
+                <input class="field" asp-for="Email" />
+                <span class="field-error" asp-validation-for="Email"></span>
+            </label>
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="admin-btn">Lưu nhân viên</button>
+            <a class="secondary-btn" asp-action="Employees">Hủy</a>
+        </div>
+    </form>
+</div>

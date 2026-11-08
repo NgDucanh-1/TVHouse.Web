@@ -1,0 +1,40 @@
+@* QUẢN TRỊ - FORM TẠO PHIẾU NHẬP: chọn nhà cung cấp, sản phẩm, số lượng, đơn giá. *@
+@model ImportFormViewModel
+@{
+    ViewData["Title"] = "Quản trị — Tạo phiếu nhập";
+    ViewData["Section"] = "imports";
+    var suppliers = (IEnumerable<SelectListItem>)ViewBag.Suppliers;
+    var products = (IEnumerable<SelectListItem>)ViewBag.Products;
+}
+<div class="panel">
+    <div class="panel-head"><h2>Tạo phiếu nhập hàng</h2><span>Số lượng nhập sẽ được cộng vào tồn kho</span></div>
+    <form method="post" asp-action="ImportSave">
+        <div class="form-grid">
+            <label class="full">Nhà cung cấp *
+                <select class="field" asp-for="SupplierId" asp-items="suppliers">
+                    <option value="0">— Chọn nhà cung cấp —</option>
+                </select>
+                <span class="field-error" asp-validation-for="SupplierId"></span>
+                <span class="hint">Chưa có nhà cung cấp? <a class="tag-main" asp-action="SupplierCreate">Thêm nhà cung cấp mới</a></span>
+            </label>
+            <label class="full">Sản phẩm *
+                <select class="field" asp-for="ProductId" asp-items="products">
+                    <option value="0">— Chọn sản phẩm —</option>
+                </select>
+                <span class="field-error" asp-validation-for="ProductId"></span>
+            </label>
+            <label>Số lượng nhập
+                <input class="field" asp-for="Quantity" type="number" min="1" step="1" />
+                <span class="field-error" asp-validation-for="Quantity"></span>
+            </label>
+            <label>Đơn giá nhập (VNĐ)
+                <input class="field" asp-for="UnitPrice" type="number" min="0" step="1" />
+                <span class="field-error" asp-validation-for="UnitPrice"></span>
+            </label>
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="admin-btn">Tạo phiếu nhập</button>
+            <a class="secondary-btn" asp-action="Imports">Hủy</a>
+        </div>
+    </form>
+</div>

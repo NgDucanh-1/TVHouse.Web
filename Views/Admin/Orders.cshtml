@@ -1,0 +1,52 @@
+@* QUẢN TRỊ - ĐƠN HÀNG: xem đơn và đổi trạng thái ngay trong bảng. *@
+@model List<Order>
+@{
+    ViewData["Title"] = "Quản trị — Đơn hàng";
+    ViewData["Section"] = "orders";
+}
+<div class="panel">
+    <div class="panel-head"><h2>Quản lý đơn hàng</h2><span>Có thể thay đổi trạng thái</span></div>
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>Mã đơn</th><th>Khách hàng</th><th>NV tư vấn</th><th>Ngày</th><th class="num">Tổng tiền</th><th>Giảm giá</th><th>Thanh toán</th><th>Trạng thái</th></tr></thead>
+            <tbody>
+            @foreach (var o in Model)
+            {
+                <tr>
+                    <td>#@o.OrderCode</td>
+                    <td>@o.CustomerName</td>
+                    <td>@o.EmployeeName</td>
+                    <td>@Fmt.Date(o.OrderDate)</td>
+                    <td class="num">@Fmt.Money(o.TotalAmount)</td>
+                    <td>
+                        @if (o.DiscountCode != null)
+                        {
+                            <span class="status good">@o.DiscountCode.Code (-@o.DiscountCode.DiscountPercent%)</span>
+                        }
+                        else
+                        {
+                            <span>—</span>
+                        }
+                    </td>
+                    <td>@o.PaymentMethod</td>
+                    <td>
+                        <form class="inline" method="post" asp-action="UpdateOrderStatus">
+                            <input type="hidden" name="id" value="@o.Id" />
+                            <select class="status-select" name="status" onchange="this.form.submit()" aria-label="Trạng thái đơn @o.OrderCode">
+                                @foreach (var s in OrderStatus.Labels)
+                                {
+                                    <option value="@s.Key" selected="@(o.Status == s.Key)">@s.Value</option>
+                                }
+                            </select>
+                        </form>
+                    </td>
+                </tr>
+            }
+            @if (Model.Count == 0)
+            {
+                <tr><td colspan="8">Chưa có đơn hàng.</td></tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>

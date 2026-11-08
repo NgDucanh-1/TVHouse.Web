@@ -1,0 +1,39 @@
+@* QUẢN TRỊ - FORM THÊM/SỬA NHÀ CUNG CẤP. *@
+@model SupplierFormViewModel
+@{
+    var isNew = Model.Id == 0;
+    ViewData["Title"] = isNew ? "Quản trị — Thêm nhà cung cấp" : "Quản trị — Sửa nhà cung cấp";
+    ViewData["Section"] = "suppliers";
+}
+<div class="panel">
+    <div class="panel-head"><h2>@(isNew ? "Thêm nhà cung cấp" : "Sửa nhà cung cấp")</h2></div>
+    <form method="post" asp-action="SupplierSave">
+        <input type="hidden" asp-for="Id" />
+        <div class="form-grid">
+            <label class="full">Tên nhà cung cấp *
+                <input class="field" asp-for="Name" />
+                <span class="field-error" asp-validation-for="Name"></span>
+            </label>
+            <label>Người liên hệ
+                <input class="field" asp-for="ContactPerson" />
+                <span class="field-error" asp-validation-for="ContactPerson"></span>
+            </label>
+            <label>Điện thoại
+                <input class="field" asp-for="Phone" />
+                <span class="field-error" asp-validation-for="Phone"></span>
+            </label>
+            <label class="full">Email
+                <input class="field" asp-for="Email" />
+                <span class="field-error" asp-validation-for="Email"></span>
+            </label>
+            <label class="full">Địa chỉ
+                <input class="field" asp-for="Address" />
+                <span class="field-error" asp-validation-for="Address"></span>
+            </label>
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="admin-btn">Lưu nhà cung cấp</button>
+            <a class="secondary-btn" asp-action="Suppliers">Hủy</a>
+        </div>
+    </form>
+</div>

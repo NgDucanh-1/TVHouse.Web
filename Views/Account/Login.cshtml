@@ -1,0 +1,31 @@
+@* Trang đăng nhập Quản trị: nhập tên đăng nhập + mật khẩu, tài khoản lấy từ bảng AdminUsers trong SQL Server *@
+@model LoginViewModel
+@{
+    ViewData["Title"] = "Đăng nhập quản trị";
+}
+<main>
+    <div class="panel login-box">
+        <div class="panel-head"><h2>Đăng nhập quản trị</h2></div>
+        <form method="post" asp-action="Login">
+            <input type="hidden" asp-for="ReturnUrl" />
+            <div asp-validation-summary="ModelOnly" class="field-error"></div>
+            <div class="form-grid">
+                <label class="full">Tên đăng nhập
+                    <input class="field" asp-for="Username" autocomplete="username" autofocus />
+                    <span class="field-error" asp-validation-for="Username"></span>
+                </label>
+                <label class="full">Mật khẩu
+                    <input class="field" asp-for="Password" type="password" autocomplete="current-password" />
+                    <span class="field-error" asp-validation-for="Password"></span>
+                </label>
+                <label class="check full">
+                    <input type="checkbox" asp-for="RememberMe" /> Ghi nhớ đăng nhập trên máy này
+                </label>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="admin-btn">Đăng nhập</button>
+                <a class="secondary-btn" asp-controller="Home" asp-action="Index">← Về cửa hàng</a>
+            </div>
+        </form>
+    </div>
+</main>

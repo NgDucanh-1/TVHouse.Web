@@ -1,0 +1,42 @@
+@* QUẢN TRỊ - FORM TẠO MÃ GIẢM GIÁ (20% - 50%, theo sản phẩm hoặc tất cả). *@
+@model DiscountFormViewModel
+@{
+    ViewData["Title"] = "Quản trị — Tạo mã giảm giá";
+    ViewData["Section"] = "discounts";
+    var products = (IEnumerable<SelectListItem>)ViewBag.DiscountProducts;
+}
+<div class="panel">
+    <div class="panel-head"><h2>Tạo mã giảm giá</h2><span>Giảm từ 20% đến 50%</span></div>
+    <form method="post" asp-action="DiscountSave">
+        <div class="form-grid">
+            <label>Mã giảm giá <span class="hint">(để trống để tự sinh mã)</span>
+                <input class="field" asp-for="Code" placeholder="VD: TVHOUSE30" />
+                <span class="field-error" asp-validation-for="Code"></span>
+            </label>
+            <label>Phần trăm giảm (20 – 50%) *
+                <input class="field" asp-for="DiscountPercent" type="number" min="20" max="50" step="1" />
+                <span class="field-error" asp-validation-for="DiscountPercent"></span>
+            </label>
+            <label class="full">Áp dụng cho sản phẩm
+                <select class="field" asp-for="ProductId" asp-items="products"></select>
+                <span class="field-error" asp-validation-for="ProductId"></span>
+            </label>
+            <label>Từ ngày
+                <input class="field" asp-for="StartDate" type="date" />
+                <span class="field-error" asp-validation-for="StartDate"></span>
+            </label>
+            <label>Đến ngày
+                <input class="field" asp-for="EndDate" type="date" />
+                <span class="field-error" asp-validation-for="EndDate"></span>
+            </label>
+            <label class="full">Số lượt dùng tối đa <span class="hint">(để trống nếu không giới hạn)</span>
+                <input class="field" asp-for="UsageLimit" type="number" min="1" step="1" />
+                <span class="field-error" asp-validation-for="UsageLimit"></span>
+            </label>
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="admin-btn">Tạo mã giảm giá</button>
+            <a class="secondary-btn" asp-action="Discounts">Hủy</a>
+        </div>
+    </form>
+</div>

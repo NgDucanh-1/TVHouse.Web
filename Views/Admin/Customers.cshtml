@@ -1,0 +1,26 @@
+@* QUẢN TRỊ - DANH SÁCH KHÁCH HÀNG. *@
+@model List<Customer>
+@{
+    ViewData["Title"] = "Quản trị — Khách hàng";
+    ViewData["Section"] = "customers";
+}
+<div class="panel">
+    <div class="panel-head"><h2>Danh sách khách hàng</h2><span>Thông tin khách mua hàng</span></div>
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>Mã KH</th><th>Họ tên</th><th>Email</th><th>Số điện thoại</th><th>Đơn hàng</th></tr></thead>
+            <tbody>
+            @foreach (var c in Model)
+            {
+                <tr>
+                    <td>@Fmt.CustomerCode(c.Id)</td>
+                    <td>@c.FullName</td>
+                    <td>@c.Email</td>
+                    <td>@c.Phone</td>
+                    <td>@c.Orders.Count</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>

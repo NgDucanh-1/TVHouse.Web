@@ -1,0 +1,44 @@
+@* QUẢN TRỊ - DANH SÁCH MÃ GIẢM GIÁ: trạng thái, lượt dùng, nút Bật/Tắt/Xóa. *@
+@model List<DiscountCode>
+@{
+    ViewData["Title"] = "Quản trị — Mã giảm giá";
+    ViewData["Section"] = "discounts";
+    var today = DateTime.Today;
+}
+<div class="panel">
+    <div class="panel-head">
+        <h2>Mã giảm giá</h2>
+        <a class="admin-btn" asp-action="DiscountCreate">+ Tạo mã giảm giá</a>
+    </div>
+    <p class="hint" style="margin:0 0 12px">Mức giảm từ 20% đến 50%. Mã gắn với 1 sản phẩm chỉ giảm giá dòng sản phẩm đó; mã “Tất cả sản phẩm” giảm trên toàn bộ giỏ hàng. Khách nhập mã ở bước xuất hóa đơn.</p>
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>Mã</th><th class="num">Giảm</th><th>Áp dụng cho</th><th>Hiệu lực</th><th class="num">Đã dùng</th><th>Trạng thái</th><th>Thao tác</th></tr></thead>
+            <tbody>
+            @foreach (var d in Model)
+            {
+                <tr>
+                    <td><b>@d.Code</b></td>
+                    <td class="num">@d.DiscountPercent%</td>
+                    <td>@(d.Product?.Name ?? "Tất cả sản phẩm")</td>
+                    <td>@Fmt.Date(d.StartDate) – @Fmt.Date(d.EndDate)</td>
+                    <td class="num">@(d.UsedCount + (d.UsageLimit.HasValue ? " / " + d.UsageLimit : ""))</td>
+                    <td><span class="status @d.StatusCss(today)">@d.StatusLabel(today)</span></td>
+                    <td>
+                        <form class="inline" method="post" asp-action="DiscountToggle" asp-route-id="@d.Id">
+                            <button type="submit" class="action-btn">@(d.IsActive ? "Tắt" : "Bật")</button>
+                        </form>
+                        <form class="inline" method="post" asp-action="DiscountDelete" asp-route-id="@d.Id" data-confirm="Xóa mã giảm giá này?">
+                            <button type="submit" class="action-btn">Xóa</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+            @if (Model.Count == 0)
+            {
+                <tr><td colspan="7">Chưa có mã giảm giá.</td></tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>

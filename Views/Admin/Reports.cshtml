@@ -1,0 +1,41 @@
+@* QUẢN TRỊ - BÁO CÁO DOANH THU (chỉ tính đơn hoàn thành). *@
+@model ReportViewModel
+@{
+    ViewData["Title"] = "Quản trị — Báo cáo";
+    ViewData["Section"] = "reports";
+}
+<div class="panel">
+    <div class="panel-head"><h2>Báo cáo doanh thu</h2><span>Chỉ tính đơn hoàn thành</span></div>
+    <div class="metric-grid">
+        <div class="metric"><small>Tổng doanh thu</small><b>@Fmt.Money(Model.Revenue)</b></div>
+        <div class="metric"><small>Đơn hoàn thành</small><b>@Model.CompletedOrders.Count</b></div>
+        <div class="metric"><small>Giá trị trung bình/đơn</small><b>@Fmt.Money(Model.Average)</b></div>
+        <div class="metric"><small>Tổng tiền đã giảm</small><b>@Fmt.Money(Model.Discounts)</b></div>
+    </div>
+</div>
+
+<div class="panel">
+    <div class="panel-head"><h2>Chi tiết đơn hoàn thành</h2></div>
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>Mã đơn</th><th>Ngày</th><th>Khách hàng</th><th>NV tư vấn</th><th class="num">Giảm giá</th><th class="num">Giá trị</th></tr></thead>
+            <tbody>
+            @foreach (var o in Model.CompletedOrders)
+            {
+                <tr>
+                    <td>#@o.OrderCode</td>
+                    <td>@Fmt.Date(o.OrderDate)</td>
+                    <td>@o.CustomerName</td>
+                    <td>@o.EmployeeName</td>
+                    <td class="num">@(o.DiscountAmount > 0 ? Fmt.Money(o.DiscountAmount) : "—")</td>
+                    <td class="num">@Fmt.Money(o.TotalAmount)</td>
+                </tr>
+            }
+            @if (Model.CompletedOrders.Count == 0)
+            {
+                <tr><td colspan="6">Chưa có đơn hoàn thành.</td></tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>
